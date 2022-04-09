@@ -1,65 +1,66 @@
-import React, { useState } from "react";
+import React, { useEffect } from "react";
 import CreeChoixMultiple from "./CreeChoixMultiple";
-import CreeTexte from "./CreeTexte";
 
 import { FaireAtelierStyled } from "./styles/FaireAtelier.styles.js";
 
 type Props = {
-  envoyerQuestion: (
-    type: number,
-    question: string,
-    reponse: string | number,
-    choix?: string[],
-    img?: string | undefined
-  ) => void;
+  id: number;
+  exercise: {
+    type: number;
+    question: string;
+    image?: string | undefined;
+    reponse: string | number;
+    choix: string[];
+  };
+  setExercise: React.Dispatch<React.SetStateAction<{
+    type: number;
+    question: string;
+    image?: string | undefined;
+    reponse: string | number;
+    choix: string[];
+}>>
 };
 
-const FaireAtelier: React.FC<Props> = ({ envoyerQuestion }) => {
-  const [type, setType] = useState<number>(1);
-  const [question, setQuestion] = useState<string>("");
-  const [image, setImage] = useState<string>("");
-  const [reponse, setReponse] = useState<string | number>(1);
-  const [choix, setChoix] = useState<string[]>(["", "", "", ""]);
-  const [showButton, setShowButton] = useState<boolean>(true);
+const FaireAtelier: React.FC<Props> = (props) => {
+  const {
+    id,
+    exercise,
+    setExercise,
+  } = props;
 
   const handleTypeChange = (e: {
     target: { value: React.SetStateAction<string> };
   }): void => {
-    setType(Number(e.target.value));
+    setExercise({ ...exercise, type: Number(e.target.value)})
+
   };
 
-  const saveExercise = () => {
-    console.log(choix);
-    if (choix[0] && image) {
-      envoyerQuestion(type, question, reponse, choix, image);
-    } else if (choix[0] && !image) {
-      envoyerQuestion(type, question, reponse, choix);
-    } else if (!choix[0] && image) {
-      envoyerQuestion(type, question, reponse, undefined, image);
-    }
-    setShowButton(false);
+  const handleReponse = (e: {
+    target: { value: React.SetStateAction<string> };
+  }): void => {
+    setExercise({ ...exercise, reponse: String(e.target.value)})
   };
 
   return (
     <FaireAtelierStyled>
-      <h1>faire un atelier</h1>
+      <h1>Exercise #{id + 1}</h1>
       <div>
-        <select value={type} onChange={handleTypeChange}>
+        <select value={exercise.type} onChange={handleTypeChange}>
           <option value={1}>texte</option>
           <option value={2}>Choix de reponse</option>
         </select>
       </div>
       <p>c'est quoi la question?</p>
-      <input onChange={(e) => setQuestion(e.target.value)}></input>
+      <input onChange={(e) => setExercise({ ...exercise, question: e.target.value})} value={exercise.question}></input>
       <p>tu met une image?(un lien live)</p>
-      <input onChange={(e) => setImage(e.target.value)}></input>
-      {type === 1 ? (
-        <CreeTexte reponse={setReponse} />
+      <input onChange={(e) => setExercise({ ...exercise, image: e.target.value})} value={exercise.image}></input>
+      {exercise.type === 1 ? (
+        <div>
+          <p>cest quoi la reponse?</p>
+          <input onChange={handleReponse} value={exercise.reponse}></input>
+        </div>
       ) : (
-        <CreeChoixMultiple reponse={setReponse} choix={setChoix} />
-      )}
-      {showButton && (
-        <button onClick={saveExercise}>sauvegarder cette exercise</button>
+        <CreeChoixMultiple exercise={exercise} setExercise={setExercise} />
       )}
     </FaireAtelierStyled>
   );

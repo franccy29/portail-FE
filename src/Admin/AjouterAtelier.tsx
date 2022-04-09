@@ -8,27 +8,13 @@ type Props = {
 };
 
 const AjouterAtelier: React.FC<Props> = ({ navigator }) => {
-  const [questionArray, setQuestionArray] = useState<JSX.Element[]>([
-    <FaireAtelier key={1} envoyerQuestion={ajouterQuestions} />,
-  ]);
+  const [questionArray, setQuestionArray] = useState<{type: number, question: string, image?: string, reponse: string | number, choix: string[]}[]>([]);
   const [semaineChoisis, setSemaineChoisis] = useState<number>(0);
-  const [titre, setTitre] = useState<string>("");
-
-  const atelierPourBdd: {
-    semaine: number;
-    titre: string;
-    questions: {
-      type: number;
-      img?: string;
-      question: string;
-      reponse: string | number;
-      choix?: string[];
-    }[];
-  } = {
-    semaine: semaineChoisis,
-    titre: titre,
-    questions: [],
-  };
+  const [titreAtelier, setTitreAtelier] = useState<string>("");
+  const [erreurForm, setErreurForm] = useState<Boolean>(false);
+  const [exercise, setExercise] = useState<{type: number, question: string, image?: string, reponse: string | number, choix: string[]}>({
+    type: 1, question: "", image: "", reponse: 1, choix: ["", "", "", ""]
+  });
 
   const handleSemaine = (input: {
     target: { value: React.SetStateAction<string> };
@@ -38,43 +24,28 @@ const AjouterAtelier: React.FC<Props> = ({ navigator }) => {
     }
   };
 
-  function ajouterQuestions(
-    type: number,
-    question: string,
-    reponse: string | number,
-    choix?: string[],
-    img?: string
-  ): void {
-    let objetQuestion: {
-      type: number;
-      img?: string;
-      question: string;
-      reponse: string | number;
-      choix?: string[];
-    } = {
-      type,
-      question,
-      reponse,
-    };
-    if (img) {
-      objetQuestion.img = img;
+
+  const ajouterQuestions = () : void => {
+    if (exercise.question !== "" && exercise.reponse !== 1 && ( exercise.reponse !== 1 || exercise.choix !== ["", "", "", ""] ) ) {
+      setQuestionArray([ ...questionArray, exercise ]);
+      setExercise({type: 1, question: "", image: "", reponse: 1, choix: ["", "", "", ""]});
+      setErreurForm(false);
+    } else {
+      setErreurForm(true);
     }
-    if (type === 2) {
-      objetQuestion.choix = choix;
-    }
-    atelierPourBdd.questions.push(objetQuestion);
-    setQuestionArray((oldArray) => [
-      ...oldArray,
-      <FaireAtelier
-        key={oldArray.length + 1}
-        envoyerQuestion={ajouterQuestions}
-      />,
-    ]);
-    console.log(atelierPourBdd);
-  }
+  };
 
   const saveAtelier = (): void => {
-    console.log("envoyer un post de lobjet a la bdd: ", atelierPourBdd);
+    const objectAEnvoyer: {} = {
+      titre: titreAtelier,
+      semaineChoisis: semaineChoisis,
+      questions: questionArray
+    };
+    if (questionArray.length > 0) {
+      console.log("envoye ca au backend: ", objectAEnvoyer);
+      setQuestionArray([]);
+      navigator("home");
+    }
   };
 
   return (
@@ -94,9 +65,9 @@ const AjouterAtelier: React.FC<Props> = ({ navigator }) => {
       </p>
       <p>quel titre va avoir ton exercises?</p>
       <input
-        placeholder={titre}
-        onChange={(e) => setTitre(e.target.value)}
-        value={titre}
+        placeholder={titreAtelier}
+        onChange={(e) => setTitreAtelier(e.target.value)}
+        value={titreAtelier}
       />
       <p>La question est pour quelle semaine?</p>
       <input
@@ -104,7 +75,14 @@ const AjouterAtelier: React.FC<Props> = ({ navigator }) => {
         onChange={handleSemaine}
         value={semaineChoisis}
       />
-      {questionArray && questionArray}
+      <FaireAtelier
+        id={questionArray.length}
+        exercise={exercise}
+        setExercise={setExercise}
+      />
+      {erreurForm && <p>les field sont pas correct pik voyon donc</p>}
+      <button onClick={() => console.log("c po fait")}>bouton genre back mais po fait</button>
+      <button onClick={ajouterQuestions}>lets go, une autrte activité</button>
       <button onClick={saveAtelier}>finito pipo, tout est fait</button>
     </AjouterAtelierStyled>
   );

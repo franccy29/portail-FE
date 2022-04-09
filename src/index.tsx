@@ -7,6 +7,7 @@ import HomePage from "./pages/HomePage";
 import NewAccount from "./pages/NewAccount";
 import Admin from "./pages/Admin";
 
+
 ReactDOM.render(
   <React.StrictMode>
     <BrowserRouter>

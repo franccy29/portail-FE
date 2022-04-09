@@ -3,22 +3,35 @@ import React, { useState } from "react";
 import { CreeChoixMultipleStyled } from "./styles/CreeChoixMultiple.styles.js";
 
 type Props = {
-  reponse: React.Dispatch<React.SetStateAction<string | number>>;
-  choix: React.Dispatch<React.SetStateAction<string[]>>;
+  exercise: {
+    type: number;
+    question: string;
+    image?: string | undefined;
+    reponse: string | number;
+    choix: string[];
+  };
+  setExercise: React.Dispatch<React.SetStateAction<{
+    type: number;
+    question: string;
+    image?: string | undefined;
+    reponse: string | number;
+    choix: string[];
+}>>;
 };
 
 let textArray: string[] = ["", "", "", ""];
-const CreeChoixMultiple: React.FC<Props> = ({ reponse, choix }) => {
+const CreeChoixMultiple: React.FC<Props> = ({ exercise, setExercise }) => {
   const [checked, setChecked] = useState<number>(1);
 
   const handleChange = (num: number): void => {
     setChecked(num);
-    reponse(num);
+    setExercise({ ...exercise, reponse: num})
   };
 
   const setText = (leChoix: string, laValue: number): void => {
     textArray[laValue - 1] = leChoix;
-    choix(textArray);
+    setExercise({ ...exercise, choix: textArray})
+
   };
 
   return (

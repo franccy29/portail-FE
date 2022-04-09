@@ -25,9 +25,10 @@ const matieres: { matiere: string; img: string }[] = [
 
 const Notes: React.FC<Props> = ({ navigator, matiereChoose }) => {
   const matiereArray: JSX.Element[] = [];
-  matieres.forEach((mat) =>
+  matieres.forEach((mat, index) =>
     matiereArray.push(
       <NotesMatiere
+        key={index}
         navigator={navigator}
         matiereChoose={matiereChoose}
         matiere={mat.matiere}
